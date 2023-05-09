@@ -2,6 +2,7 @@ import cors from 'cors';
 import express, { Request, Response } from 'express';
 import Redis from './util/Redis';
 import isValidRequest from './util/isValidRequest';
+import {GeoReplyWith} from 'redis';
 
 require('dotenv').config();
 
@@ -26,7 +27,7 @@ app.get('/trees', async (req: Request, res: Response) => {
       'trees',
       { latitude, longitude },
       { radius: radius || 0.1, unit: 'mi' },
-      ['COORDINATES'],
+      [GeoReplyWith.COORDINATES],
     );
     
     res.send(nearbyTrees);
