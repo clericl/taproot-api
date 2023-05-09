@@ -22,10 +22,11 @@ app.get('/trees', async (req: Request, res: Response) => {
   if (isValidRequest(latitude, longitude)) {
     await client.connect();
 
-    const nearbyTrees = await client.geoSearch(
+    const nearbyTrees = await client.geoSearchWith(
       'trees',
       { latitude, longitude },
       { radius: radius || 0.1, unit: 'mi' },
+      ['COORDINATES'],
     );
     
     res.send(nearbyTrees);
