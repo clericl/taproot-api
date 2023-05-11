@@ -23,15 +23,19 @@ app.get('/trees', async (req: Request, res: Response) => {
   if (isValidRequest(latitude, longitude)) {
     await client.connect();
 
-    const nearbyTrees = await client.geoSearchWith(
-      'trees',
-      { latitude, longitude },
-      { radius: radius || 0.1, unit: 'mi' },
-      [GeoReplyWith.COORDINATES],
-    );
-    
-    res.send(nearbyTrees);
-    await client.disconnect();
+    if (client.isOpen) {
+      const nearbyTrees = await client.geoSearchWith(
+        'trees',
+        { latitude, longitude },
+        { radius: radius || 0.1, unit: 'mi' },
+        [GeoReplyWith.COORDINATES],
+      );
+      
+      res.send(nearbyTrees);
+      await client.quit();
+    } else {
+      res.status(503).send('client was not ready!');
+    }
   } else {
     res.status(400).send('invalid parameters');
   };
@@ -43,15 +47,19 @@ app.get('/ntas', async (req: Request, res: Response) => {
   if (isValidRequest(latitude, longitude)) {
     await client.connect();
 
-    const nearbyNtas = await client.geoSearchWith(
-      'ntas',
-      { latitude, longitude },
-      { radius: radius || 0.1, unit: 'mi' },
-      [GeoReplyWith.COORDINATES],
-    );
-    
-    res.send(nearbyNtas);
-    await client.disconnect();
+    if (client.isOpen) {
+      const nearbyNtas = await client.geoSearchWith(
+        'ntas',
+        { latitude, longitude },
+        { radius: radius || 0.1, unit: 'mi' },
+        [GeoReplyWith.COORDINATES],
+      );
+      
+      res.send(nearbyNtas);
+      await client.quit();
+    } else {
+      res.status(503).send('client was not ready!');
+    }
   } else {
     res.status(400).send('invalid parameters');
   };
