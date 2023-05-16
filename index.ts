@@ -85,7 +85,6 @@ app.get('/species', async (req: Request, res: Response) => {
       }
 
       const nearbyTreesOfSpecies = await transaction.exec()
-      console.log(nearbyTreesOfSpecies)
       
       res.send(nearbyTreesOfSpecies);
       await client.quit();
