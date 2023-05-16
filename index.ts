@@ -65,6 +65,38 @@ app.get('/ntas', async (req: Request, res: Response) => {
   };
 });
 
+app.get('/species', async (req: Request, res: Response) => {
+  const { latitude, longitude, radius, species } = req.query;
+  
+  if (isValidRequest(latitude, longitude)) {
+    await client.connect();
+
+    if (client.isOpen) {
+      let transaction = await client.multi()
+      const speciesList = typeof species === 'string' ? species.split(',') : []
+
+      for (const individualSpecies of speciesList) {
+        transaction = await transaction.geoSearchWith(
+          `species:${individualSpecies.replaceAll(' ', '_')}`,
+          { latitude, longitude },
+          { radius: radius || 0.1, unit: 'mi' },
+          [GeoReplyWith.COORDINATES],
+        )
+      }
+
+      const nearbyTreesOfSpecies = await transaction.exec()
+      console.log(nearbyTreesOfSpecies)
+      
+      res.send(nearbyTreesOfSpecies);
+      await client.quit();
+    } else {
+      res.status(503).send('client was not ready!');
+    }
+  } else {
+    res.status(400).send('invalid parameters');
+  };
+});
+
 const port = parseInt(process.env.PORT || '') || 8080;
 app.listen(port, () => {
   console.log(`listening on port ${port}`);
