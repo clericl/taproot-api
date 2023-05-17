@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express, { Request, Response } from 'express';
+import BQClient from './util/BQClient';
 import Redis from './util/Redis';
 import isValidRequest from './util/isValidRequest';
 import {GeoReplyWith} from 'redis';
@@ -16,6 +17,30 @@ app.get('/', (_: Request, res: Response) => {
   const name = process.env.NAME || 'World';
   res.send(`Hello ${name}!`);
 });
+
+app.get('/tree/:id', async (req: Request, res: Response) => {
+  const client = new BQClient()
+  const { id } = req.params
+
+  const parsedId = parseInt(id)
+
+  if (parsedId) {
+    const bqRes = await client.getTree(parseInt(id))
+  
+    if (bqRes.data) {
+      if (bqRes.data.length) {
+        res.send(bqRes.data[0])
+      } else {
+        res.status(404).send('tree not found')
+      }
+    } else {
+      res.status(500).send('whoops')
+    }
+  } else {
+    res.status(403).send('invalid parameters')
+  }
+
+})
 
 app.get('/trees', async (req: Request, res: Response) => {
   const { latitude, longitude, radius } = req.query;
