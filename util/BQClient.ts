@@ -30,7 +30,7 @@ class BQClient {
     const sqlQuery = `
       SELECT *
       FROM \`${process.env.TREES_TABLE}\`
-      WHERE tree_id = ${id}
+      WHERE OBJECTID = ${id}
       LIMIT ${1}
     `
 
