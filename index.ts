@@ -25,7 +25,7 @@ app.get('/tree/:id', async (req: Request, res: Response) => {
   const parsedId = parseInt(id)
 
   if (parsedId) {
-    const bqRes = await client.getTree(parseInt(id))
+    const bqRes = await client.getTree(parsedId)
   
     if (bqRes.data) {
       if (bqRes.data.length) {
